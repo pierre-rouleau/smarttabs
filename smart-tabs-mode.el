@@ -261,7 +261,7 @@ Smarttabs is enabled in mode hook.")
 (defun smart-tabs-insinuate (&rest languages)
   "Enable smart-tabs-mode for LANGUAGES.
 LANGUAGES is a list of SYMBOL or NAME as defined in
-'smart-tabs-insinuate-alist' alist or a language using standard named
+\\='smart-tabs-insinuate-alist\\=' alist or a language using standard named
 indent function and indent level.
 "
   (mapc (lambda (lang)
