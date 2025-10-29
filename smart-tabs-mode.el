@@ -1,4 +1,4 @@
-;;; smart-tabs-mode.el --- Intelligently indent with tabs, align with spaces!
+;;; smart-tabs-mode.el --- Intelligently indent with tabs, align with spaces! -*-lexical-binding: t-*-
 
 ;; Copyright © 2011 John Croisant <jacius@gmail.com>
 ;; Copyright © 2011 Joel C. Salomon <joelcsalomon@gmail.com>
@@ -201,11 +201,13 @@ Smarttabs is enabled in mode hook.")
 
 
 (defmacro smart-tabs-mode/no-tabs-mode-advice (function)
-  `(unless (ad-find-advice ',function 'around 'smart-tabs)
-     (define-advice ,function (:around (orig-fun &rest args) smart-tabs)
-       (if smart-tabs-mode
-           (let ((indent-tabs-mode nil)) (apply orig-fun args))
-         (apply orig-fun args)))))
+  (let ((gn-adv-fct (intern (format "%s@smart-tabs" function))))
+    `(unless (ad-find-advice ',function 'around 'smart-tabs)
+       (declare-function ,gn-adv-fct "smart-tabs-mode")
+       (define-advice ,function (:around (orig-fun &rest args) smart-tabs)
+         (if smart-tabs-mode
+             (let ((indent-tabs-mode nil)) (apply orig-fun args))
+           (apply orig-fun args))))))
 
 ;;;###autoload
 (define-minor-mode smart-tabs-mode
@@ -221,8 +223,8 @@ Smarttabs is enabled in mode hook.")
     (smart-tabs-mode/no-tabs-mode-advice comment-box)
     (smart-tabs-mode/no-tabs-mode-advice comment-indent)
 
-    (unless
-        (ad-find-advice 'indent-according-to-mode 'around 'smart-tabs)
+    (unless (ad-find-advice 'indent-according-to-mode 'around 'smart-tabs)
+      (declare-function indent-according-to-mode@smart-tabs "smart-tabs-mode")
       (define-advice indent-according-to-mode (:around (orig-fun &rest args) smart-tabs)
         (if smart-tabs-mode
             (let ((indent-tabs-mode indent-tabs-mode))
