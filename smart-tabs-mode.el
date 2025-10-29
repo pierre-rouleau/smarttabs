@@ -133,18 +133,16 @@
 (defvar smart-tabs-mode nil
   "Define if smart-tabs-mode is enabled")
 
+;;;###autoload
+(defmacro smart-tabs-create-advice-list (advice-list)
+  `(cl-loop for (func . offset) in ,advice-list
+            collect `(smart-tabs-advice ,func ,offset)))
 
 ;;;###autoload
 (defmacro smart-tabs-when (condition advice-list)
   (declare (indent 1))
   `(when ,condition
      ,@(smart-tabs-create-advice-list advice-list)))
-
-
-;;;###autoload
-(defmacro smart-tabs-create-advice-list (advice-list)
-  `(cl-loop for (func . offset) in ,advice-list
-            collect `(smart-tabs-advice ,func ,offset)))
 
 
 ;;;###autoload
@@ -204,10 +202,10 @@ Smarttabs is enabled in mode hook.")
 
 (defmacro smart-tabs-mode/no-tabs-mode-advice (function)
   `(unless (ad-find-advice ',function 'around 'smart-tabs)
-     (defadvice ,function (around smart-tabs activate)
+     (define-advice ,function (:around (orig-fun &rest args) smart-tabs)
        (if smart-tabs-mode
-           (let ((indent-tabs-mode nil)) ad-do-it)
-         ad-do-it))))
+           (let ((indent-tabs-mode nil)) (apply orig-fun args))
+         (apply orig-fun args)))))
 
 ;;;###autoload
 (define-minor-mode smart-tabs-mode
@@ -225,15 +223,15 @@ Smarttabs is enabled in mode hook.")
 
     (unless
         (ad-find-advice 'indent-according-to-mode 'around 'smart-tabs)
-      (defadvice indent-according-to-mode (around smart-tabs activate)
+      (define-advice indent-according-to-mode (:around (orig-fun &rest args) smart-tabs)
         (if smart-tabs-mode
             (let ((indent-tabs-mode indent-tabs-mode))
               (if (memq indent-line-function
                         '(indent-relative
                           indent-relative-maybe))
                   (setq indent-tabs-mode nil))
-              ad-do-it)
-          ad-do-it)))
+              (apply orig-fun args))
+          (apply orig-fun args))))
     ))
 
 ;;;###autoload
@@ -244,7 +242,7 @@ Smarttabs is enabled in mode hook.")
 ;;;###autoload
 (defmacro smart-tabs-advice (function offset)
   `(progn
-     (defadvice ,function (around smart-tabs activate)
+     (define-advice ,function (:around (orig-fun &rest args) smart-tabs)
        (cond
         ((and smart-tabs-mode indent-tabs-mode (eq ,offset tab-width))
          (save-excursion
@@ -255,15 +253,15 @@ Smarttabs is enabled in mode hook.")
          (let ((tab-width fill-column)
                (,offset fill-column))
            (unwind-protect
-               (progn ad-do-it))))
+               (progn (apply orig-fun args)))))
         (t
-         ad-do-it)))))
+         (apply orig-fun args))))))
 
 ;;;###autoload
 (defun smart-tabs-insinuate (&rest languages)
   "Enable smart-tabs-mode for LANGUAGES.
 LANGUAGES is a list of SYMBOL or NAME as defined in
-'smart-tabs-insinuate-alist' alist or a language using standard named
+\\='smart-tabs-insinuate-alist\\=' alist or a language using standard named
 indent function and indent level.
 "
   (mapc (lambda (lang)
