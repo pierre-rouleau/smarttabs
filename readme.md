@@ -1,5 +1,8 @@
 [![MELPA](https://melpa.org/packages/smart-tabs-mode-badge.svg)](https://melpa.org/#/smart-tabs-mode)
 
+My fork.
+I will try to follow changes done by others and integrate it here.
+I may not push it back to the original until I see some activity.
 
 Smart Tabs
 ==========
