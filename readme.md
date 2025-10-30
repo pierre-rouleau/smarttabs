@@ -4,7 +4,7 @@
 Smart Tabs
 ==========
 *Indent with tabs; align with spaces*
-![“Tabs.” “Spaces.” “Both.”][tsb]
+<!-- ![“Tabs.” “Spaces.” “Both.”][tsb] -->
 
 See [EmacsWiki › SmartTabs][est] for details about the idea this package enables.
 
@@ -21,4 +21,4 @@ Tabs are only used at the **beginning of lines**. Everything else, like ASCII ar
 Tabs are only used for **expressing the indentation level**. One tab per “block” – any remaining whitespace is spaces only.
 
 [est]: http://www.emacswiki.org/emacs/SmartTabs
-[tsb]: http://www.emacswiki.org/pics/static/TabsSpacesBoth.png
+<!-- [tsb]: http://www.emacswiki.org/pics/static/TabsSpacesBoth.png -->
